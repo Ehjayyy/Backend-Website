@@ -3,7 +3,7 @@ const axios = require('axios');
 
 async function testLogin() {
     try {
-        const response = await axios.post('http://localhost:4000/api/auth/login', {
+        const response = await axios.post('https://marketplace-backend-t6d6.onrender.com/api/auth/login', {
             email: 'testbuyer@example.com',
             password: 'testpassword123'
         });

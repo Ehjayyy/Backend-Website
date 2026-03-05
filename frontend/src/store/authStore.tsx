@@ -1,5 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react";
+import { API_ENDPOINTS } from "../config/api";
+import { apiPost } from "../lib/api";
 
 export type Role = "BUYER" | "SELLER" | "ADMIN";
 
@@ -45,41 +47,39 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const ready = true; // Always ready
 
   const register = useCallback<AuthContextValue["register"]>(async ({ name, email, password, role }) => {
-    const response = await fetch("http://localhost:4000/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ name, email, password, role }),
+    const response = await apiPost(API_ENDPOINTS.auth.register, {
+      name,
+      email,
+      password,
+      role,
     });
 
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(data?.message || "Registration failed");
+    if (!response.success) {
+      throw new Error(response.error || "Registration failed");
     }
 
-    setUser(data.user);
-    setToken(data.token);
-    localStorage.setItem(TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    const { user, token } = response.data as { user: AuthUser; token: string };
+    setUser(user);
+    setToken(token);
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   }, []);
 
   const login = useCallback<AuthContextValue["login"]>(async ({ email, password }) => {
-    const response = await fetch("http://localhost:4000/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+    const response = await apiPost(API_ENDPOINTS.auth.login, {
+      email,
+      password,
     });
 
-    const data = await response.json().catch(() => null);
-
-    if (!response.ok) {
-      throw new Error(data?.message || "Login failed");
+    if (!response.success) {
+      throw new Error(response.error || "Login failed");
     }
 
-    setUser(data.user);
-    setToken(data.token);
-    localStorage.setItem(TOKEN_KEY, data.token);
-    localStorage.setItem(USER_KEY, JSON.stringify(data.user));
+    const { user, token } = response.data as { user: AuthUser; token: string };
+    setUser(user);
+    setToken(token);
+    localStorage.setItem(TOKEN_KEY, token);
+    localStorage.setItem(USER_KEY, JSON.stringify(user));
   }, []);
 
   const logout = useCallback(() => {

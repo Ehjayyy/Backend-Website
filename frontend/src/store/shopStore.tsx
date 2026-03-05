@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./authStore";
+import { API_ENDPOINTS } from "../config/api";
+import { apiGet, apiPost } from "../lib/api";
 
 export type Shop = {
   id: number;
@@ -31,15 +33,10 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
     }
 
     try {
-      const response = await fetch("http://localhost:4000/api/shops/me", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await apiGet(API_ENDPOINTS.shops.me);
 
-      if (response.ok) {
-        const data = await response.json();
-        setMyShop(data);
+      if (response.success) {
+        setMyShop(response.data);
       } else {
         setMyShop(null);
       }
@@ -67,30 +64,21 @@ export function ShopProvider({ children }: { children: React.ReactNode }) {
       throw new Error("Only sellers can create shops.");
     }
 
-    const response = await fetch("http://localhost:4000/api/shops", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        shop_name,
-        description,
-      }),
+    const response = await apiPost(API_ENDPOINTS.shops.create, {
+      shop_name,
+      description,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to create shop");
+    if (!response.success) {
+      throw new Error(response.error || "Failed to create shop");
     }
 
-    const data = await response.json();
-    setMyShop(data);
+    setMyShop(response.data);
   };
 
   const updateShop: ShopContextValue["updateShop"] = async ({ shop_name, description }) => {
     if (!ready || !user || !token) throw new Error("Not logged in.");
-    const response = await fetch("http://localhost:4000/api/shops", {
+    const response = await fetch(API_ENDPOINTS.shops.list, {
       method: "PUT",
       headers: {
         "Content-Type": "application/json",

@@ -2,6 +2,8 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
 import { useAuth } from "./authStore";
 import { useShop } from "./shopStore";
+import { API_ENDPOINTS } from "../config/api";
+import { apiGet, apiPost } from "../lib/api";
 
 export type Product = {
   id: number;
@@ -44,7 +46,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
   const [products, setProducts] = useState<Product[]>([]);
   const [loading, setLoading] = useState(false);
 
-  const reload = useCallback(async () => {
+    const reload = useCallback(async () => {
     // If auth not ready yet or not logged in or no shop -> empty list
     if (!ready || !user || !token || !myShop) {
       setProducts([]);
@@ -53,18 +55,14 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/products/shop", {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
-      });
-
-      if (!response.ok) {
+      const response = await apiGet(API_ENDPOINTS.products.shop);
+      
+      if (!response.success) {
         setProducts([]);
         return;
       }
 
-      const data = (await response.json()) as Product[];
+      const data = response.data as Product[];
       setProducts(data);
     } catch (err) {
       console.error("Failed to load products:", err);
@@ -84,19 +82,10 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
       if (!user || !token) throw new Error("Not logged in");
       if (!myShop) throw new Error("No shop found");
 
-      const response = await fetch("http://localhost:4000/api/products", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify(p),
-      });
+      const response = await apiPost(API_ENDPOINTS.products.create, p);
 
-      const data = await response.json().catch(() => null);
-
-      if (!response.ok) {
-        throw new Error(data?.message || "Failed to add product");
+      if (!response.success) {
+        throw new Error(response.error || "Failed to add product");
       }
 
       await reload();
@@ -108,7 +97,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     async (id, patch) => {
       if (!user || !token) throw new Error("Not logged in");
 
-      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+      const response = await fetch(API_ENDPOINTS.products.product(id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -132,7 +121,7 @@ export function ProductProvider({ children }: { children: React.ReactNode }) {
     async (id) => {
       if (!user || !token) throw new Error("Not logged in");
 
-      const response = await fetch(`http://localhost:4000/api/products/${id}`, {
+      const response = await fetch(API_ENDPOINTS.products.product(id), {
         method: "DELETE",
         headers: {
           Authorization: `Bearer ${token}`,

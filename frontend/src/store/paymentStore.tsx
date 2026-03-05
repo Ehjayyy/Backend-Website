@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo } from "react";
 import { useAuth } from "./authStore";
+import { API_ENDPOINTS } from "../config/api";
+import { apiPost } from "../lib/api";
 
 export type PaymentStatus = "PENDING" | "PAID" | "FAILED";
 
@@ -28,30 +30,22 @@ export function PaymentProvider({ children }: { children: React.ReactNode }) {
     payment_status,
   }) => {
     if (!ready || !user || !token) throw new Error("You must be logged in.");
-    const response = await fetch("http://localhost:4000/api/payments", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        order_id,
-        payment_method,
-        payment_status,
-      }),
+    const response = await apiPost(API_ENDPOINTS.payments.create, {
+      order_id,
+      payment_method,
+      payment_status,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to create payment");
+    if (!response.success) {
+      throw new Error(response.error || "Failed to create payment");
     }
 
-    return await response.json();
+    return response.data;
   };
 
   const getPaymentByOrderId: PaymentContextValue["getPaymentByOrderId"] = async (orderId: number) => {
     if (!ready || !user || !token) return null;
-    const response = await fetch(`http://localhost:4000/api/payments/order/${orderId}`, {
+    const response = await fetch(API_ENDPOINTS.payments.order(orderId), {
       headers: {
         "Authorization": `Bearer ${token}`,
       },

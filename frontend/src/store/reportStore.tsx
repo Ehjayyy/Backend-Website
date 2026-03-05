@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { useAuth } from "./authStore";
+import { API_ENDPOINTS } from "../config/api";
+import { apiGet, apiPost } from "../lib/api";
 
 export type ReportTargetType = "seller" | "product";
 
@@ -35,15 +37,10 @@ export function ReportProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/reports/me", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await apiGet(API_ENDPOINTS.reports.me);
 
-      if (response.ok) {
-        const data = await response.json();
-        setReports(data);
+      if (response.success) {
+        setReports(response.data);
       } else {
         setReports([]);
       }
@@ -61,22 +58,14 @@ export function ReportProvider({ children }: { children: React.ReactNode }) {
 
   const submitReport: ReportContextValue["submitReport"] = async ({ target_type, target_id, reason }) => {
     if (!ready || !user || !token) throw new Error("You must be logged in.");
-    const response = await fetch("http://localhost:4000/api/reports", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        target_type,
-        target_id,
-        reason,
-      }),
+    const response = await apiPost(API_ENDPOINTS.reports.create, {
+      target_type,
+      target_id,
+      reason,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to submit report");
+    if (!response.success) {
+      throw new Error(response.error || "Failed to submit report");
     }
 
     await reload();

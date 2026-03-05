@@ -4,7 +4,7 @@ const axios = require('axios');
 async function testCreateShop() {
     try {
         // First, login as the seller
-        const loginResponse = await axios.post('http://localhost:4000/api/auth/login', {
+        const loginResponse = await axios.post('https://marketplace-backend-t6d6.onrender.com/api/auth/login', {
             email: 'testseller@example.com',
             password: 'testpassword123'
         });
@@ -12,7 +12,7 @@ async function testCreateShop() {
         const token = loginResponse.data.token;
         
         // Now create a shop
-        const shopResponse = await axios.post('http://localhost:4000/api/shops', {
+        const shopResponse = await axios.post('https://marketplace-backend-t6d6.onrender.com/api/shops', {
             shop_name: 'Test Shop',
             description: 'This is a test shop'
         }, {

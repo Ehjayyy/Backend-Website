@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 async function testCreateNewShop() {
-  const baseUrl = 'http://localhost:4000';
+  const baseUrl = 'https://marketplace-backend-t6d6.onrender.com';
   const newUser = {
     name: 'New Test Seller',
     email: 'newtestseller@example.com',

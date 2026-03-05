@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 async function testCreateShopForUser2() {
-  const baseUrl = 'http://localhost:4000';
+  const baseUrl = 'https://marketplace-backend-t6d6.onrender.com';
   const loginData = {
     email: 'early@gmail.com',
     password: 'password123'

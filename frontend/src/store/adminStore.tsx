@@ -1,6 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo, useState, useCallback } from "react";
 import { useAuth } from "./authStore";
+import { API_ENDPOINTS } from "../config/api";
 
 export type DashboardStats = {
   users: number;
@@ -181,7 +182,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setStatsLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/dashboard/stats", {
+      const response = await fetch(API_ENDPOINTS.admin.dashboard, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -200,7 +201,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setUsersLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/users", {
+      const response = await fetch(API_ENDPOINTS.admin.users, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -219,7 +220,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setShopsLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/shops", {
+      const response = await fetch(API_ENDPOINTS.admin.shops, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -238,7 +239,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setProductsLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/products", {
+      const response = await fetch(API_ENDPOINTS.admin.products, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -257,7 +258,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setReportsLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/reports", {
+      const response = await fetch(API_ENDPOINTS.admin.reports, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -276,7 +277,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setOrdersLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/orders", {
+      const response = await fetch(API_ENDPOINTS.admin.orders, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -295,7 +296,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
     if (!token) return;
     setCategoriesLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/admin/categories", {
+      const response = await fetch(API_ENDPOINTS.admin.categories, {
         headers: {
           "Authorization": `Bearer ${token}`,
         },
@@ -313,7 +314,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const deleteUser = useCallback(async (id: number) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/users/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.user(id), {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -330,7 +331,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const deleteShop = useCallback(async (id: number) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/shops/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.shop(id), {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -347,7 +348,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const deleteProduct = useCallback(async (id: number) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/products/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.product(id), {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -364,7 +365,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const deleteReport = useCallback(async (id: number) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/reports/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.report(id), {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,
@@ -381,7 +382,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const updateReportStatus = useCallback(async (id: number, status: string) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/reports/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.report(id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -401,7 +402,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const createCategory = useCallback(async (name: string) => {
     if (!token) return;
     try {
-      const response = await fetch("http://localhost:4000/api/admin/categories", {
+      const response = await fetch(API_ENDPOINTS.admin.categories, {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -421,7 +422,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const updateCategory = useCallback(async (id: number, name: string) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/categories/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.category(id), {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
@@ -441,7 +442,7 @@ export function AdminProvider({ children }: { children: React.ReactNode }) {
   const deleteCategory = useCallback(async (id: number) => {
     if (!token) return;
     try {
-      const response = await fetch(`http://localhost:4000/api/admin/categories/${id}`, {
+      const response = await fetch(API_ENDPOINTS.admin.category(id), {
         method: "DELETE",
         headers: {
           "Authorization": `Bearer ${token}`,

@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import React, { createContext, useContext, useMemo, useState, useEffect } from "react";
 import { useAuth } from "./authStore";
+import { API_ENDPOINTS } from "../config/api";
+import { apiGet, apiPost } from "../lib/api";
 
 export type OrderStatus = "PENDING" | "PAID" | "SHIPPED" | "COMPLETED" | "CANCELLED";
 
@@ -51,15 +53,10 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
     setLoading(true);
     try {
-      const response = await fetch("http://localhost:4000/api/orders", {
-        headers: {
-          "Authorization": `Bearer ${token}`,
-        },
-      });
+      const response = await apiGet(API_ENDPOINTS.orders.list);
 
-      if (response.ok) {
-        const data = await response.json();
-        setOrders(data);
+      if (response.success) {
+        setOrders(response.data);
       } else {
         setOrders([]);
       }
@@ -87,24 +84,16 @@ export function OrderProvider({ children }: { children: React.ReactNode }) {
 
   const createOrder: OrderContextValue["createOrder"] = async ({ total_amount, items }) => {
     if (!ready || !user || !token) throw new Error("You must be logged in.");
-    const response = await fetch("http://localhost:4000/api/orders", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Authorization": `Bearer ${token}`,
-      },
-      body: JSON.stringify({
-        total_amount,
-        items,
-      }),
+    const response = await apiPost(API_ENDPOINTS.orders.create, {
+      total_amount,
+      items,
     });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(error.message || "Failed to create order");
+    if (!response.success) {
+      throw new Error(response.error || "Failed to create order");
     }
 
-    const data = await response.json();
+    const data = response.data;
     await reload();
     return data;
   };

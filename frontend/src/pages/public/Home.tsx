@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import ProductGrid from "../../components/products/ProductGrid";
 import type { Category, Product } from "../../types/models";
+import { API_ENDPOINTS } from "../../config/api";
+import { apiGet } from "../../lib/api";
 
 export default function Home() {
   const [q, setQ] = useState("");
@@ -21,10 +23,9 @@ export default function Home() {
       if (catId !== "all") params.append("category_id", catId.toString());
       if (q) params.append("search", q);
 
-      const response = await fetch(`http://localhost:4000/api/products?${params.toString()}`);
-      if (response.ok) {
-        const data = await response.json();
-        setProducts(data);
+      const response = await apiGet(`${API_ENDPOINTS.products.list}?${params.toString()}`);
+      if (response.success) {
+        setProducts(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch products:", error);
@@ -35,10 +36,9 @@ export default function Home() {
 
   const fetchCategories = async () => {
     try {
-      const response = await fetch("http://localhost:4000/api/categories");
-      if (response.ok) {
-        const data = await response.json();
-        setCategories(data);
+      const response = await apiGet(API_ENDPOINTS.categories);
+      if (response.success) {
+        setCategories(response.data);
       }
     } catch (error) {
       console.error("Failed to fetch categories:", error);
